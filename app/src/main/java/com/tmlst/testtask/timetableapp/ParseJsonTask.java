@@ -61,14 +61,11 @@ public class ParseJsonTask extends AsyncTask<Void, Void, String> {
     private List<City> getStationNames(String jsonString, String stationType) {
 
         List<City> cities = new ArrayList<>();
-        JSONObject dataJsonObj;
 
         try {
-
-            dataJsonObj = new JSONObject(jsonString);
+            JSONObject dataJsonObj = new JSONObject(jsonString);
             JSONArray citiesJSONArray = dataJsonObj.getJSONArray(stationType);
             Point point;
-
 
             for (int j = 0; j <citiesJSONArray.length(); j++) {
 
