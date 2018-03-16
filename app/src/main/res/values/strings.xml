@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TimetableApp</string>
+    <string name="json_file_name">TimetableApp</string>
 </resources>
