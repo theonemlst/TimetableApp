@@ -1,9 +1,7 @@
 package com.tmlst.testtask.timetableapp;
 
 import android.content.Context;
-import android.widget.Toast;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,13 +12,13 @@ import java.io.OutputStream;
  * Created by User on 16.03.2018.
  */
 
-public class FileHelper {
+class FileHelper {
 
     private Context context;
     private String fileName = null;
     private static final String JSON_FILE_NAME = "allStations.json";
 
-    public FileHelper(Context context) {
+    FileHelper(Context context) {
 
         this.context = context;
         fileName = context.getResources().getString(R.string.json_file_name);
@@ -31,7 +29,7 @@ public class FileHelper {
     }
 
     //    Читаем json из памяти и возвращаем в виде строки
-    public String getJsonString() {
+    String getJsonString() {
 
         try {
             context.openFileInput(fileName);
