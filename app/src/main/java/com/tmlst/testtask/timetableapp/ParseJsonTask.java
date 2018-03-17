@@ -3,9 +3,7 @@ package com.tmlst.testtask.timetableapp;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
 
 import com.tmlst.testtask.timetableapp.model.City;
@@ -51,23 +49,6 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
     @Override
     protected void onPostExecute(Model model) {
         super.onPostExecute(model);
-
-//        ListView stationsFromListView =
-//                ((Activity) context).findViewById(R.id.stationsFrom);
-//        ListView stationsToListView =
-//                ((Activity) context).findViewById(R.id.stationsTo);
-//
-//        ArrayAdapter<City> arrayAdapterFrom = new ArrayAdapter<>(
-//                context,
-//                android.R.layout.simple_list_item_1, model.getCitiesFrom());
-//
-//        ArrayAdapter<City> arrayAdapterTo = new ArrayAdapter<>(
-//                context,
-//                android.R.layout.simple_list_item_1, model.getCitiesTo());
-//
-//        stationsFromListView.setAdapter(arrayAdapterFrom);
-//        stationsToListView.setAdapter(arrayAdapterTo);
-
 
         ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
         ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
