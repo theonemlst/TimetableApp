@@ -74,6 +74,7 @@ public class SearchableExpandableListAdapter extends BaseExpandableListAdapter i
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         View v;
         String cityName = (String) getGroup(groupPosition);
+        String countryName = filteredCityList.get(groupPosition).get("countryTitle");
         if (convertView == null) {
             v = mInflater.inflate(R.layout.group_items, null);
         } else {
@@ -81,6 +82,8 @@ public class SearchableExpandableListAdapter extends BaseExpandableListAdapter i
         }
         TextView childItem = v.findViewById(R.id.city_name);
         childItem.setText(cityName);
+        childItem = v.findViewById(R.id.country_name);
+        childItem.setText(countryName);
         return v;
     }
 
