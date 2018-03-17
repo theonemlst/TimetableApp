@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.tmlst.testtask.timetableapp.model.City;
+import com.tmlst.testtask.timetableapp.model.Model;
 import com.tmlst.testtask.timetableapp.model.Point;
 import com.tmlst.testtask.timetableapp.model.Station;
 
@@ -21,42 +22,44 @@ import java.util.List;
  * Created by User on 16.03.2018.
  */
 
-public class ParseJsonTask extends AsyncTask<Void, Void, String> {
+public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
 
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
 
     private Context context;
+    private Model model;
 
     ParseJsonTask(Context context) {
         this.context = context;
     }
 
     @Override
-    protected String doInBackground(Void... voids) {
+    protected Model doInBackground(Void... voids) {
         FileHelper fileHelper = new FileHelper(context);
-        return fileHelper.getJsonString();
+        String jsonString = fileHelper.getJsonString();
+        model = new Model();
+        model.setCitiesFrom(getCities(jsonString, STATIONS_FROM));
+        model.setCitiesTo(getCities(jsonString, STATIONS_TO));
+        return model;
     }
 
     @Override
-    protected void onPostExecute(String jsonString) {
-        super.onPostExecute(jsonString);
+    protected void onPostExecute(Model model) {
+        super.onPostExecute(model);
 
         ListView stationsFromListView =
                 ((Activity) context).findViewById(R.id.stationsFrom);
         ListView stationsToListView =
                 ((Activity) context).findViewById(R.id.stationsTo);
 
-        List<City> stationsFrom = getCities(jsonString, STATIONS_FROM);
-        List<City> stationsTo = getCities(jsonString, STATIONS_TO);
-
         ArrayAdapter<City> arrayAdapterFrom = new ArrayAdapter<>(
                 context,
-                android.R.layout.simple_list_item_1, stationsFrom);
+                android.R.layout.simple_list_item_1, model.getCitiesFrom());
 
         ArrayAdapter<City> arrayAdapterTo = new ArrayAdapter<>(
                 context,
-                android.R.layout.simple_list_item_1, stationsTo);
+                android.R.layout.simple_list_item_1, model.getCitiesTo());
 
         stationsFromListView.setAdapter(arrayAdapterFrom);
         stationsToListView.setAdapter(arrayAdapterTo);
