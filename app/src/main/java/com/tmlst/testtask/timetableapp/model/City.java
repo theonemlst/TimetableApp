@@ -1,4 +1,4 @@
-package com.tmlst.testtask.timetableapp;
+package com.tmlst.testtask.timetableapp.model;
 
 import java.util.List;
 

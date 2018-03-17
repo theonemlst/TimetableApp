@@ -6,6 +6,10 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.tmlst.testtask.timetableapp.model.City;
+import com.tmlst.testtask.timetableapp.model.Point;
+import com.tmlst.testtask.timetableapp.model.Station;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,8 +47,8 @@ public class ParseJsonTask extends AsyncTask<Void, Void, String> {
         ListView stationsToListView =
                 ((Activity) context).findViewById(R.id.stationsTo);
 
-        List<City> stationsFrom = getStationNames(jsonString, STATIONS_FROM);
-        List<City> stationsTo = getStationNames(jsonString, STATIONS_TO);
+        List<City> stationsFrom = getCities(jsonString, STATIONS_FROM);
+        List<City> stationsTo = getCities(jsonString, STATIONS_TO);
 
         ArrayAdapter<City> arrayAdapterFrom = new ArrayAdapter<>(
                 context,
@@ -58,14 +62,13 @@ public class ParseJsonTask extends AsyncTask<Void, Void, String> {
         stationsToListView.setAdapter(arrayAdapterTo);
     }
 
-    private List<City> getStationNames(String jsonString, String stationType) {
+    private List<City> getCities(String jsonString, String citiesType) {
 
         List<City> cities = new ArrayList<>();
 
         try {
-            JSONObject dataJsonObj = new JSONObject(jsonString);
-            JSONArray citiesJSONArray = dataJsonObj.getJSONArray(stationType);
-            Point point;
+            JSONObject jsonDataObj = new JSONObject(jsonString);
+            JSONArray citiesJSONArray = jsonDataObj.getJSONArray(citiesType);
 
             for (int j = 0; j <citiesJSONArray.length(); j++) {
 
@@ -73,7 +76,7 @@ public class ParseJsonTask extends AsyncTask<Void, Void, String> {
                 City city = new City();
 
                 JSONObject pointJSONObject = cityJSONObject.getJSONObject("point");
-                point = new Point();
+                Point point = new Point();
 
                 point.setLongitude(pointJSONObject.getDouble("longitude"));
                 point.setLatitude(pointJSONObject.getDouble("latitude"));
@@ -85,40 +88,49 @@ public class ParseJsonTask extends AsyncTask<Void, Void, String> {
                 city.setCityTitle(cityJSONObject.getString("cityTitle"));
                 city.setRegionTitle(cityJSONObject.getString("regionTitle"));
 
-                JSONArray cityStationsJSONArray = cityJSONObject.getJSONArray("stations");
-                List<Station> stations = new ArrayList<>();
+                city.setStations(getCityStations(cityJSONObject));
 
-                for (int i = 0; i < cityStationsJSONArray.length(); i++) {
-
-                    JSONObject stationJSONObject = cityStationsJSONArray.getJSONObject(i);
-                    Station station = new Station();
-
-                    pointJSONObject = stationJSONObject.getJSONObject("point");
-                    point = new Point();
-
-                    point.setLongitude(pointJSONObject.getDouble("longitude"));
-                    point.setLatitude(pointJSONObject.getDouble("latitude"));
-
-                    station.setPoint(point);
-                    station.setCountryTitle(stationJSONObject.getString("countryTitle"));
-                    station.setDistrictTitle(stationJSONObject.getString("districtTitle"));
-                    station.setCityId(stationJSONObject.getInt("cityId"));
-                    station.setCityTitle(stationJSONObject.getString("cityTitle"));
-                    station.setRegionTitle(stationJSONObject.getString("regionTitle"));
-                    station.setStationId(stationJSONObject.getInt("stationId"));
-                    station.setStationTitle(stationJSONObject.getString("stationTitle"));
-
-                    stations.add(station);
-                }
-
-                city.setStations(stations);
                 cities.add(city);
             }
-
         } catch(JSONException e){
             e.printStackTrace();
         }
 
         return cities;
+    }
+
+    private List<Station> getCityStations(JSONObject cityJSONObject) {
+
+        List<Station> cityStations = new ArrayList<>();
+        try{
+            JSONArray cityStationsJSONArray = cityJSONObject.getJSONArray("stations");
+
+            for (int i = 0; i < cityStationsJSONArray.length(); i++) {
+
+                JSONObject stationJSONObject = cityStationsJSONArray.getJSONObject(i);
+                Station station = new Station();
+
+                JSONObject pointJSONObject = stationJSONObject.getJSONObject("point");
+                Point point = new Point();
+
+                point.setLongitude(pointJSONObject.getDouble("longitude"));
+                point.setLatitude(pointJSONObject.getDouble("latitude"));
+
+                station.setPoint(point);
+                station.setCountryTitle(stationJSONObject.getString("countryTitle"));
+                station.setDistrictTitle(stationJSONObject.getString("districtTitle"));
+                station.setCityId(stationJSONObject.getInt("cityId"));
+                station.setCityTitle(stationJSONObject.getString("cityTitle"));
+                station.setRegionTitle(stationJSONObject.getString("regionTitle"));
+                station.setStationId(stationJSONObject.getInt("stationId"));
+                station.setStationTitle(stationJSONObject.getString("stationTitle"));
+
+                cityStations.add(station);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return cityStations;
     }
 }

@@ -1,4 +1,6 @@
-package com.tmlst.testtask.timetableapp;
+package com.tmlst.testtask.timetableapp.model;
+
+import com.tmlst.testtask.timetableapp.model.Point;
 
 /**
  * Created by User on 16.03.2018.
