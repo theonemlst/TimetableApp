@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleExpandableListAdapter;
 
 import com.tmlst.testtask.timetableapp.model.City;
@@ -24,13 +26,17 @@ import java.util.Map;
  * Created by User on 16.03.2018.
  */
 
-public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
+public class ParseJsonTask extends AsyncTask<Void, Void, Model> implements SearchView.OnQueryTextListener {
 
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
 
     private Context context;
     private Model model;
+
+    private ListView list;
+    private ListAdapter adapter;
+    private SearchView editsearch;
 
     ParseJsonTask(Context context) {
         this.context = context;
@@ -50,42 +56,60 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
     protected void onPostExecute(Model model) {
         super.onPostExecute(model);
 
-        ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
-        ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
+//        ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
+//        ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
+//
+//        Map<String, String> map;
+//        ArrayList<Map<String, String>> сhildDataItemList;
+//
+//        String groupFrom[] = new String[] { "cityName", "countryTitle" };
+//        int groupTo[] = new int[] { android.R.id.text2, android.R.id.text1 };
+//
+//        String childFrom[] = new String[] { "stationName" };
+//        int childTo[] = new int[] { android.R.id.text1 };
+//
+//        for (City city : model.getCitiesFrom()) {
+//            map = new HashMap<>();
+//            map.put("cityName", city.getCityTitle());
+//            map.put("countryTitle", city.getCountryTitle());
+//            groupDataList.add(map);
+//
+//            сhildDataItemList = new ArrayList<>();
+//            for (Station station  : city.getStations()) {
+//                map = new HashMap<>();
+//                map.put("stationName", station.getStationTitle());
+//                сhildDataItemList.add(map);
+//            }
+//            сhildDataList.add(сhildDataItemList);
+//        }
+//
+//        SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
+//                context, groupDataList,
+//                android.R.layout.simple_expandable_list_item_2, groupFrom,
+//                groupTo, сhildDataList, android.R.layout.simple_list_item_1,
+//                childFrom, childTo);
+//
+//        ExpandableListView expandableListView = ((Activity) context).
+//                findViewById(R.id.stationsFrom);
+//        expandableListView.setAdapter(adapter);
 
-        Map<String, String> map;
-        ArrayList<Map<String, String>> сhildDataItemList;
+        list = ((Activity) context).findViewById(R.id.list_view);
+        adapter = new ListAdapter(context, model.getCitiesFrom());
+        list.setAdapter(adapter);
 
-        String groupFrom[] = new String[] { "cityName", "countryTitle" };
-        int groupTo[] = new int[] { android.R.id.text2, android.R.id.text1 };
+        editsearch = ((Activity) context).findViewById(R.id.search);
+        editsearch.setOnQueryTextListener(this);
+    }
 
-        String childFrom[] = new String[] { "stationName" };
-        int childTo[] = new int[] { android.R.id.text1 };
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
 
-        for (City city : model.getCitiesFrom()) {
-            map = new HashMap<>();
-            map.put("cityName", city.getCityTitle());
-            map.put("countryTitle", city.getCountryTitle());
-            groupDataList.add(map);
-
-            сhildDataItemList = new ArrayList<>();
-            for (Station station  : city.getStations()) {
-                map = new HashMap<>();
-                map.put("stationName", station.getStationTitle());
-                сhildDataItemList.add(map);
-            }
-            сhildDataList.add(сhildDataItemList);
-        }
-
-        SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
-                context, groupDataList,
-                android.R.layout.simple_expandable_list_item_2, groupFrom,
-                groupTo, сhildDataList, android.R.layout.simple_list_item_1,
-                childFrom, childTo);
-
-        ExpandableListView expandableListView = ((Activity) context).
-                findViewById(R.id.stationsFrom);
-        expandableListView.setAdapter(adapter);
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        adapter.filter(newText);
+        return false;
     }
 
     private List<City> getCities(String jsonString, String citiesType) {
