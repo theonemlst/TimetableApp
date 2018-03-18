@@ -1,12 +1,14 @@
 package com.tmlst.testtask.timetableapp.model;
 
-import com.tmlst.testtask.timetableapp.model.Point;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 
 /**
  * Created by User on 16.03.2018.
  */
 
-public class Station {
+public class Station implements Parcelable{
 
     private String countryTitle;
     private Point point;
@@ -16,6 +18,9 @@ public class Station {
     private String regionTitle;
     private int stationId;
     private String stationTitle;
+
+    public Station() {
+    }
 
     public String getCountryTitle() {
         return countryTitle;
@@ -80,4 +85,51 @@ public class Station {
     public void setStationTitle(String stationTitle) {
         this.stationTitle = stationTitle;
     }
+
+
+    private Station(Parcel in){
+        String[] data = new String[9];
+
+        in.readStringArray(data);
+
+        this.countryTitle = data[0];
+        Point point = new Point();
+        point.setLongitude(Double.valueOf(data[1]));
+        point.setLatitude(Double.valueOf(data[2]));
+        this.point = point;
+        this.districtTitle = data[3];
+        this.cityId = Integer.valueOf(data[4]);
+        this.cityTitle = data[5];
+        this.regionTitle = data[6];
+        this.stationId = Integer.valueOf(data[7]);
+        this.stationTitle = data[8];
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[] {this.countryTitle,
+                String.valueOf(this.point.getLongitude()),
+                String.valueOf(this.point.getLatitude()),
+                this.districtTitle,
+                String.valueOf(this.cityId),
+                this.cityTitle,
+                this.regionTitle,
+                String.valueOf(this.stationId),
+                this.stationTitle
+        });
+    }
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Station createFromParcel(Parcel in) {
+            return new Station(in);
+        }
+
+        public Station[] newArray(int size) {
+            return new Station[size];
+        }
+    };
 }

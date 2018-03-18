@@ -7,11 +7,16 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tmlst.testtask.timetableapp.model.Model;
+import com.tmlst.testtask.timetableapp.model.Station;
 
 
 public class MainActivity extends Activity {
 
+    public static final String STATION_TYPE = "stationType";
+
     private Model model;
+    private TextView from;
+    private TextView to;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,29 +24,54 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         model = Model.getInstance();
-        ParseJsonTask parseJsonTask = new ParseJsonTask(this, model);
+        JsonParser parseJsonTask = new JsonParser(this, model);
         parseJsonTask.execute();
 
-        TextView from = findViewById(R.id.stationFrom);
+        from = findViewById(R.id.stationFrom);
         from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startChooseActivity(ParseJsonTask.CITYFROM);
+                startChooseActivity(JsonParser.CITYFROM);
             }
         });
 
-        TextView to = findViewById(R.id.stationTo);
+        to = findViewById(R.id.stationTo);
         to.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startChooseActivity(ParseJsonTask.CITYTO);
+                startChooseActivity(JsonParser.CITYTO);
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            String stationType = null;
+            Station station = null;
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                stationType = (String) bundle.get(STATION_TYPE);
+                station = (Station) bundle.get("station");
+            }
+            if (stationType != null) {
+                switch (stationType) {
+                    case JsonParser.CITYFROM:
+                        if (station != null)
+                            from.setText(station.getStationTitle());
+                        break;
+                    case JsonParser.CITYTO:
+                        if (station != null)
+                            to.setText(station.getStationTitle());
+                        break;
+                }
+            }
+        }
+    }
+
     public void startChooseActivity(String stationType) {
-        Intent intent = new Intent(MainActivity.this, ChooseStationActivity.class);
-        intent.putExtra("type", stationType);
-        startActivity(intent);
+        Intent intent = new Intent(MainActivity.this, ChooseActivity.class);
+        intent.putExtra(STATION_TYPE, stationType);
+        startActivityForResult(intent, 1);
     }
 }

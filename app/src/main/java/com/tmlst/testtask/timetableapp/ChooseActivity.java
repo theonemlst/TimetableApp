@@ -12,10 +12,11 @@ import android.widget.SearchView;
 import com.tmlst.testtask.timetableapp.model.Model;
 import com.tmlst.testtask.timetableapp.model.Station;
 
-public class ChooseStationActivity extends Activity
-        implements SearchView.OnQueryTextListener, ParseJsonTask.OnParseListener {
 
-    private SearchableExpandableListAdapter adapter;
+public class ChooseActivity extends Activity
+        implements SearchView.OnQueryTextListener, JsonParser.OnParseListener {
+
+    private ListAdapter adapter;
     private ExpandableListView expandableListView;
 
     private String stationsType;
@@ -23,7 +24,7 @@ public class ChooseStationActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_station);
+        setContentView(R.layout.activity_choose);
 
         expandableListView = findViewById(R.id.list_view);
         expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -41,7 +42,7 @@ public class ChooseStationActivity extends Activity
                             "Область:  " + station.getRegionTitle() + "\n" +
                             "Район:    " + station.getDistrictTitle();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseStationActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ChooseActivity.this);
                     builder.setTitle(station.getStationTitle())
                             .setMessage(stationInfo)
                             .setCancelable(true);
@@ -54,12 +55,29 @@ public class ChooseStationActivity extends Activity
                 return false;
             }
         });
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-        ParseJsonTask.setOnParseListener(this);
+                Station station = Model.getInstance().getCitiesFrom().
+                        get(groupPosition).getStations().get(childPosition);
+
+                Intent intent = new Intent(ChooseActivity.this, MainActivity.class);
+                intent.putExtra("station", station);
+                intent.putExtra("stationType",stationsType);
+                setResult(RESULT_OK, intent);
+                finish();
+
+                return false;
+            }
+        });
+
+//        TODO: improve logic
+        JsonParser.setOnParseListener(this);
 
         Intent intent = getIntent();
         if (intent.getExtras() != null) {
-             stationsType = intent.getStringExtra("type");
+             stationsType = intent.getStringExtra(MainActivity.STATION_TYPE);
         }
         setStationsAdapter();
 
@@ -75,14 +93,14 @@ public class ChooseStationActivity extends Activity
     private void setStationsAdapter() {
         switch (stationsType) {
             case "FROM":
-                if (SearchableExpandableListAdapter.adapterFrom != null) {
-                    adapter = SearchableExpandableListAdapter.adapterFrom;
+                if (ListAdapter.adapterFrom != null) {
+                    adapter = ListAdapter.adapterFrom;
                     adapter.notifyDataSetChanged();
                 }
                 break;
             case "TO":
-                if (SearchableExpandableListAdapter.adapterTo != null) {
-                    adapter = SearchableExpandableListAdapter.adapterTo;
+                if (ListAdapter.adapterTo != null) {
+                    adapter = ListAdapter.adapterTo;
                     adapter.notifyDataSetChanged();
                 }
                 break;
@@ -98,7 +116,6 @@ public class ChooseStationActivity extends Activity
     @Override
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
-        //expandableListView.smoothScrollToPosition(0);
         return false;
     }
 

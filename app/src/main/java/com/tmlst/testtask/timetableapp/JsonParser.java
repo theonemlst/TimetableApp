@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by User on 16.03.2018.
  */
 
-public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
+public class JsonParser extends AsyncTask<Void, Void, Model> {
 
     public static final String CITYFROM = "FROM";
     public static final String CITYTO = "TO";
@@ -38,7 +38,7 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
     private Context context;
     private Model mModel;
 
-    ParseJsonTask(Context context, Model mModel) {
+    JsonParser(Context context, Model mModel) {
         this.context = context;
         this.mModel = mModel;
     }
@@ -54,8 +54,8 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
 
     @Override
     protected void onPostExecute(Model model) {
-        SearchableExpandableListAdapter.adapterFrom = getAdapter(mModel, CITYFROM);
-        SearchableExpandableListAdapter.adapterTo = getAdapter(mModel, CITYTO);
+        ListAdapter.adapterFrom = getAdapter(mModel, CITYFROM);
+        ListAdapter.adapterTo = getAdapter(mModel, CITYTO);
         if (mlistener != null)
             mlistener.onComplete();
     }
@@ -65,7 +65,7 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
         mlistener = listener;
     }
 
-    private SearchableExpandableListAdapter getAdapter(Model model, String citiesType) {
+    private ListAdapter getAdapter(Model model, String citiesType) {
 
         ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
         ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
@@ -94,7 +94,7 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
             сhildDataList.add(сhildDataItemList);
         }
 
-        return new SearchableExpandableListAdapter(context, groupDataList, сhildDataList);
+        return new ListAdapter(context, groupDataList, сhildDataList);
     }
 
     private List<City> getCities(String jsonString, String citiesType) {

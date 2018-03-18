@@ -16,10 +16,10 @@ import java.util.Map;
  * Created by User on 17.03.2018.
  */
 
-public class SearchableExpandableListAdapter extends BaseExpandableListAdapter implements Filterable {
+public class ListAdapter extends BaseExpandableListAdapter implements Filterable {
 
-    static SearchableExpandableListAdapter adapterFrom = null;
-    static SearchableExpandableListAdapter adapterTo = null;
+    static ListAdapter adapterFrom = null;
+    static ListAdapter adapterTo = null;
 
     private ArrayList<Map<String, String>> originalCityList = null;
     private ArrayList<Map<String, String>> filteredCityList = null;
@@ -29,9 +29,9 @@ public class SearchableExpandableListAdapter extends BaseExpandableListAdapter i
     private LayoutInflater mInflater;
     private ItemFilter mFilter = new ItemFilter();
 
-    SearchableExpandableListAdapter(Context context,
-                                    ArrayList<Map<String, String>> cityList,
-                                    ArrayList<ArrayList<Map<String, String>>> stationList) {
+    ListAdapter(Context context,
+                ArrayList<Map<String, String>> cityList,
+                ArrayList<ArrayList<Map<String, String>>> stationList) {
         this.filteredCityList = cityList;
         this.originalCityList = cityList;
         this.originalStationList = stationList;

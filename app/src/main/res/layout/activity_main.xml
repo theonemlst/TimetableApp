@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,8 +7,10 @@
     tools:context="com.tmlst.testtask.timetableapp.MainActivity">
 
     <LinearLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:id="@+id/stats"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerInParent="true">
 
         <TextView
             android:id="@+id/stationFrom"
@@ -16,7 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Откуда"/>
+            android:background="@android:color/holo_green_light"
+            android:text="Откуда" />
 
         <TextView
             android:id="@+id/stationTo"
@@ -24,8 +27,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Куда"/>
+            android:background="@android:color/holo_green_light"
+            android:text=" Куда "/>
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/stats"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_blue_light"
+        android:text="Дата"/>
+
+</RelativeLayout>
