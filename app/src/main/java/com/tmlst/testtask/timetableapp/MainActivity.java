@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tmlst.testtask.timetableapp.model.Model;
 import com.tmlst.testtask.timetableapp.model.Station;
@@ -17,6 +18,9 @@ public class MainActivity extends Activity {
     private Model model;
     private TextView from;
     private TextView to;
+
+    private Station stationFrom;
+    private Station stationTo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,7 @@ public class MainActivity extends Activity {
                 startChooseActivity(JsonParser.CITYFROM);
             }
         });
+        if (stationFrom != null) from.setText(stationFrom.getStationTitle());
 
         to = findViewById(R.id.stationTo);
         to.setOnClickListener(new View.OnClickListener() {
@@ -42,6 +47,7 @@ public class MainActivity extends Activity {
                 startChooseActivity(JsonParser.CITYTO);
             }
         });
+        if (stationTo != null) from.setText(stationTo.getStationTitle());
     }
 
     @Override
@@ -57,12 +63,24 @@ public class MainActivity extends Activity {
             if (stationType != null) {
                 switch (stationType) {
                     case JsonParser.CITYFROM:
-                        if (station != null)
+                        if (station != null && !station.equals(stationTo)) {
+                            stationFrom = station;
                             from.setText(station.getStationTitle());
+                        }
+                        if (station != null && station.equals(stationTo)) {
+                            Toast.makeText(this, "stations are equal!",
+                                    Toast.LENGTH_LONG).show();
+                        }
                         break;
                     case JsonParser.CITYTO:
-                        if (station != null)
+                        if (station != null && !station.equals(stationFrom)) {
+                            stationTo = station;
                             to.setText(station.getStationTitle());
+                        }
+                        if (station != null && station.equals(stationFrom)) {
+                            Toast.makeText(this, "stations are equal!",
+                                    Toast.LENGTH_LONG).show();
+                        }
                         break;
                 }
             }

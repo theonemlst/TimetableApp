@@ -86,6 +86,22 @@ public class Station implements Parcelable{
         this.stationTitle = stationTitle;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Station station = (Station) o;
+
+        return stationId == station.stationId;
+    }
+
+    @Override
+    public int hashCode() {
+        return stationId;
+    }
+
+// Parcelable part
 
     private Station(Parcel in){
         String[] data = new String[9];
@@ -123,6 +139,7 @@ public class Station implements Parcelable{
                 this.stationTitle
         });
     }
+
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         public Station createFromParcel(Parcel in) {
             return new Station(in);
