@@ -18,6 +18,9 @@ import java.util.Map;
 
 public class SearchableExpandableListAdapter extends BaseExpandableListAdapter implements Filterable {
 
+    static SearchableExpandableListAdapter adapterFrom = null;
+    static SearchableExpandableListAdapter adapterTo = null;
+
     private ArrayList<Map<String, String>> originalCityList = null;
     private ArrayList<Map<String, String>> filteredCityList = null;
     private ArrayList<ArrayList<Map<String, String>>> originalStationList = null;

@@ -23,20 +23,22 @@ import java.util.Map;
 
 public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
 
+    public static final String CITYFROM = "FROM";
+    public static final String CITYTO = "TO";
 
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
-    private OnParseListener listener;
+    private static OnParseListener mlistener;
 
     public interface OnParseListener
     {
-        void onComplete(SearchableExpandableListAdapter adapter);
+        void onComplete();
     }
 
     private Context context;
     private Model mModel;
 
-    public ParseJsonTask(Context context, Model mModel) {
+    ParseJsonTask(Context context, Model mModel) {
         this.context = context;
         this.mModel = mModel;
     }
@@ -52,6 +54,18 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
 
     @Override
     protected void onPostExecute(Model model) {
+        SearchableExpandableListAdapter.adapterFrom = getAdapter(mModel, CITYFROM);
+        SearchableExpandableListAdapter.adapterTo = getAdapter(mModel, CITYTO);
+        if (mlistener != null)
+            mlistener.onComplete();
+    }
+
+    static void setOnParseListener(OnParseListener listener)
+    {
+        mlistener = listener;
+    }
+
+    private SearchableExpandableListAdapter getAdapter(Model model, String citiesType) {
 
         ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
         ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
@@ -59,7 +73,13 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
         Map<String, String> map;
         ArrayList<Map<String, String>> сhildDataItemList;
 
-        for (City city : model.getCitiesFrom()) {
+        List<City> cities = null;
+        if (citiesType.equals(CITYFROM))
+            cities = model.getCitiesFrom();
+        if (citiesType.equals(CITYTO))
+            cities = model.getCitiesTo();
+
+        for (City city : cities) {
             map = new HashMap<>();
             map.put("cityName", city.getCityTitle());
             map.put("countryTitle", city.getCountryTitle());
@@ -74,14 +94,7 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
             сhildDataList.add(сhildDataItemList);
         }
 
-        SearchableExpandableListAdapter adapter =
-                new SearchableExpandableListAdapter(context, groupDataList, сhildDataList);
-        listener.onComplete(adapter);
-    }
-
-    void setOnParseListener(OnParseListener listener)
-    {
-        this.listener = listener;
+        return new SearchableExpandableListAdapter(context, groupDataList, сhildDataList);
     }
 
     private List<City> getCities(String jsonString, String citiesType) {
