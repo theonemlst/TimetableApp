@@ -124,17 +124,29 @@ public class SearchableExpandableListAdapter extends BaseExpandableListAdapter i
                     new ArrayList<>(stationCount);
 
             for (int i = 0; i < cityCount; i++) {
-                ArrayList<Map<String, String>> matchedStationNames = new ArrayList<>();
-                ArrayList<Map<String, String>> stationsOfCity =
-                        originalStationList.get(i);
-                for (Map<String, String> station : stationsOfCity) {
-                    if (station.get("stationName").
-                            toLowerCase().contains(filterString))
-                        matchedStationNames.add(station);
-                }
-                if (matchedStationNames.size() > 0) {
+                if (originalCityList.get(i).get("countryTitle").
+                        toLowerCase().contains(filterString)) {
                     newCityList.add(originalCityList.get(i));
-                    newStationList.add(matchedStationNames);
+                    newStationList.add(originalStationList.get(i));
+                } else {
+                    if (originalCityList.get(i).get("cityName").
+                            toLowerCase().contains(filterString)) {
+                        newCityList.add(originalCityList.get(i));
+                        newStationList.add(originalStationList.get(i));
+                    } else {
+                        ArrayList<Map<String, String>> matchedStationNames = new ArrayList<>();
+                        ArrayList<Map<String, String>> stationsOfCity =
+                                originalStationList.get(i);
+                        for (Map<String, String> station : stationsOfCity) {
+                            if (station.get("stationName").
+                                    toLowerCase().contains(filterString))
+                                matchedStationNames.add(station);
+                        }
+                        if (matchedStationNames.size() > 0) {
+                            newCityList.add(originalCityList.get(i));
+                            newStationList.add(matchedStationNames);
+                        }
+                    }
                 }
             }
             filteredCityList = newCityList;
