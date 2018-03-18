@@ -1,10 +1,7 @@
 package com.tmlst.testtask.timetableapp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ExpandableListView;
-import android.widget.SearchView;
 
 import com.tmlst.testtask.timetableapp.model.City;
 import com.tmlst.testtask.timetableapp.model.Model;
@@ -24,35 +21,37 @@ import java.util.Map;
  * Created by User on 16.03.2018.
  */
 
-public class ParseJsonTask extends AsyncTask<Void, Void, Model>
-                            implements SearchView.OnQueryTextListener {
+public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
+
 
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
+    private OnParseListener listener;
+
+    public interface OnParseListener
+    {
+        void onComplete(SearchableExpandableListAdapter adapter);
+    }
 
     private Context context;
-    private Model model;
+    private Model mModel;
 
-    private SearchableExpandableListAdapter adapter;
-    private SearchView editsearch;
-
-    ParseJsonTask(Context context) {
+    public ParseJsonTask(Context context, Model mModel) {
         this.context = context;
+        this.mModel = mModel;
     }
 
     @Override
     protected Model doInBackground(Void... voids) {
         FileHelper fileHelper = new FileHelper(context);
         String jsonString = fileHelper.getJsonString();
-        model = new Model();
-        model.setCitiesFrom(getCities(jsonString, STATIONS_FROM));
-        model.setCitiesTo(getCities(jsonString, STATIONS_TO));
-        return model;
+        mModel.setCitiesFrom(getCities(jsonString, STATIONS_FROM));
+        mModel.setCitiesTo(getCities(jsonString, STATIONS_TO));
+        return mModel;
     }
 
     @Override
     protected void onPostExecute(Model model) {
-        super.onPostExecute(model);
 
         ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
         ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
@@ -75,26 +74,14 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model>
             сhildDataList.add(сhildDataItemList);
         }
 
-        adapter = new SearchableExpandableListAdapter(context,
-                groupDataList, сhildDataList);
-
-        ExpandableListView expandableListView = ((Activity) context).
-                findViewById(R.id.list_view);
-        expandableListView.setAdapter(adapter);
-
-        editsearch = ((Activity) context).findViewById(R.id.search);
-        editsearch.setOnQueryTextListener(this);
+        SearchableExpandableListAdapter adapter =
+                new SearchableExpandableListAdapter(context, groupDataList, сhildDataList);
+        listener.onComplete(adapter);
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        adapter.getFilter().filter(newText);
-        return false;
+    void setOnParseListener(OnParseListener listener)
+    {
+        this.listener = listener;
     }
 
     private List<City> getCities(String jsonString, String citiesType) {

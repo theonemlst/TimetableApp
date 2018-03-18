@@ -22,12 +22,13 @@ public class SearchableExpandableListAdapter extends BaseExpandableListAdapter i
     private ArrayList<Map<String, String>> filteredCityList = null;
     private ArrayList<ArrayList<Map<String, String>>> originalStationList = null;
     private ArrayList<ArrayList<Map<String, String>>> filteredStationList = null;
+
     private LayoutInflater mInflater;
     private ItemFilter mFilter = new ItemFilter();
 
     SearchableExpandableListAdapter(Context context,
-                                           ArrayList<Map<String, String>> cityList,
-                                           ArrayList<ArrayList<Map<String, String>>> stationList) {
+                                    ArrayList<Map<String, String>> cityList,
+                                    ArrayList<ArrayList<Map<String, String>>> stationList) {
         this.filteredCityList = cityList;
         this.originalCityList = cityList;
         this.originalStationList = stationList;
