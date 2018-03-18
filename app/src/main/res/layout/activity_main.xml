@@ -6,41 +6,26 @@
     android:layout_height="match_parent"
     tools:context="com.tmlst.testtask.timetableapp.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/layoutFrom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <SearchView
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <ExpandableListView
-            android:id="@+id/stationsFrom"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-        </ExpandableListView>
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/search" />
 
-        <ListView
-            android:id="@+id/stationsTo"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-        </ListView>
-
-    </LinearLayout>
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/layoutTo"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_weight="1"-->
-        <!--android:layout_toRightOf="@id/layoutFrom"-->
-        <!--android:layout_toEndOf="@id/layoutFrom">-->
-
-        <!--<ListView-->
-            <!--android:id="@+id/stationsTo"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
-        <!--</ListView>-->
-
-    <!--</LinearLayout>-->
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

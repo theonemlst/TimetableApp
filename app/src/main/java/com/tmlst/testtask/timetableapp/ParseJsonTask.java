@@ -1,12 +1,7 @@
 package com.tmlst.testtask.timetableapp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ListView;
-import android.widget.SimpleExpandableListAdapter;
 
 import com.tmlst.testtask.timetableapp.model.City;
 import com.tmlst.testtask.timetableapp.model.Model;
@@ -28,58 +23,41 @@ import java.util.Map;
 
 public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
 
+
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
+    private OnParseListener listener;
+
+    public interface OnParseListener
+    {
+        void onComplete(SearchableExpandableListAdapter adapter);
+    }
 
     private Context context;
-    private Model model;
+    private Model mModel;
 
-    ParseJsonTask(Context context) {
+    public ParseJsonTask(Context context, Model mModel) {
         this.context = context;
+        this.mModel = mModel;
     }
 
     @Override
     protected Model doInBackground(Void... voids) {
         FileHelper fileHelper = new FileHelper(context);
         String jsonString = fileHelper.getJsonString();
-        model = new Model();
-        model.setCitiesFrom(getCities(jsonString, STATIONS_FROM));
-        model.setCitiesTo(getCities(jsonString, STATIONS_TO));
-        return model;
+        mModel.setCitiesFrom(getCities(jsonString, STATIONS_FROM));
+        mModel.setCitiesTo(getCities(jsonString, STATIONS_TO));
+        return mModel;
     }
 
     @Override
     protected void onPostExecute(Model model) {
-        super.onPostExecute(model);
-
-//        ListView stationsFromListView =
-//                ((Activity) context).findViewById(R.id.stationsFrom);
-//        ListView stationsToListView =
-//                ((Activity) context).findViewById(R.id.stationsTo);
-//
-//        ArrayAdapter<City> arrayAdapterFrom = new ArrayAdapter<>(
-//                context,
-//                android.R.layout.simple_list_item_1, model.getCitiesFrom());
-//
-//        ArrayAdapter<City> arrayAdapterTo = new ArrayAdapter<>(
-//                context,
-//                android.R.layout.simple_list_item_1, model.getCitiesTo());
-//
-//        stationsFromListView.setAdapter(arrayAdapterFrom);
-//        stationsToListView.setAdapter(arrayAdapterTo);
-
 
         ArrayList<Map<String, String>> groupDataList = new ArrayList<>();
         ArrayList<ArrayList<Map<String, String>>> сhildDataList = new ArrayList<>();
 
         Map<String, String> map;
         ArrayList<Map<String, String>> сhildDataItemList;
-
-        String groupFrom[] = new String[] { "cityName", "countryTitle" };
-        int groupTo[] = new int[] { android.R.id.text2, android.R.id.text1 };
-
-        String childFrom[] = new String[] { "stationName" };
-        int childTo[] = new int[] { android.R.id.text1 };
 
         for (City city : model.getCitiesFrom()) {
             map = new HashMap<>();
@@ -96,15 +74,14 @@ public class ParseJsonTask extends AsyncTask<Void, Void, Model> {
             сhildDataList.add(сhildDataItemList);
         }
 
-        SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
-                context, groupDataList,
-                android.R.layout.simple_expandable_list_item_2, groupFrom,
-                groupTo, сhildDataList, android.R.layout.simple_list_item_1,
-                childFrom, childTo);
+        SearchableExpandableListAdapter adapter =
+                new SearchableExpandableListAdapter(context, groupDataList, сhildDataList);
+        listener.onComplete(adapter);
+    }
 
-        ExpandableListView expandableListView = ((Activity) context).
-                findViewById(R.id.stationsFrom);
-        expandableListView.setAdapter(adapter);
+    void setOnParseListener(OnParseListener listener)
+    {
+        this.listener = listener;
     }
 
     private List<City> getCities(String jsonString, String citiesType) {
