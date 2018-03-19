@@ -39,6 +39,11 @@ public class ListAdapter extends BaseExpandableListAdapter implements Filterable
         mInflater = LayoutInflater.from(context);
     }
 
+    int getStationId(int groupPosition, int childPosition) {
+        return Integer.valueOf(filteredStationList.
+                get(groupPosition).get(childPosition).get("stationId"));
+    }
+
     @Override
     public int getGroupCount() {
         return filteredCityList.size();

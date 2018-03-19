@@ -64,11 +64,10 @@ public class ChooseActivity extends Activity
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
-                Station station = Model.getInstance().getCitiesFrom().
-                        get(groupPosition).getStations().get(childPosition);
+                int stationId = adapter.getStationId(groupPosition, childPosition);
 
                 Intent intent = new Intent(ChooseActivity.this, MainActivity.class);
-                intent.putExtra(STATION, station);
+                intent.putExtra(STATION, stationId);
                 intent.putExtra(STATION_TYPE,stationsType);
                 setResult(RESULT_OK, intent);
                 finish();
@@ -121,9 +120,6 @@ public class ChooseActivity extends Activity
     @Override
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
-        for (int i = 0; i < adapter.getGroupCount(); i++) {
-            expandableListView.collapseGroup(i);
-        }
         return false;
     }
 }

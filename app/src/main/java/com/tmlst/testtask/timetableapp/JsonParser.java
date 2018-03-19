@@ -90,6 +90,7 @@ public class JsonParser extends AsyncTask<Void, Void, Model> {
             for (Station station  : city.getStations()) {
                 map = new HashMap<>();
                 map.put("stationName", station.getStationTitle());
+                map.put("stationId", String.valueOf(station.getStationId()));
                 сhildDataItemList.add(map);
             }
             сhildDataList.add(сhildDataItemList);

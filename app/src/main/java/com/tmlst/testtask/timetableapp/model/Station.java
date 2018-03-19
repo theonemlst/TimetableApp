@@ -7,7 +7,7 @@ import android.os.Parcelable;
 /**
  * Created by User on 16.03.2018.
  */
-
+                     // TODO: no more need to implement this
 public class Station implements Parcelable{
 
     private String countryTitle;

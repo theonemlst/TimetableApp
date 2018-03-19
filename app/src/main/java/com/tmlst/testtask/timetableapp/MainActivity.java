@@ -221,33 +221,39 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             String stationType = null;
-            Station station = null;
+            int stationId = -1;
             Bundle bundle = data.getExtras();
             if (bundle != null) {
                 stationType = (String) bundle.get(STATION_TYPE);
-                station = (Station) bundle.get(STATION);
+                stationId = (int) bundle.get(STATION);
             }
             if (stationType != null) {
                 switch (stationType) {
                     case CITYFROM:
-                        if (station != null && !station.equals(stationTo)) {
-                            stationFrom = station;
-                            from.setText(station.getStationTitle());
+                        if (stationId != -1 && stationId != stationTo.getStationId()) {
+                            stationFrom = getStationById("FROM", stationId);
+                            if (stationFrom != null)
+                                from.setText(stationFrom.getStationTitle());
                         }
-                        if (station != null && station.equals(stationTo)) {
+                        if (stationId != -1 && stationId == stationTo.getStationId()) {
                             Toast.makeText(this, STATION_EQUAL,
                                     Toast.LENGTH_LONG).show();
                         }
+                        // сбром фильтра
+                        ListAdapter.adapterFrom.getFilter().filter("");
                         break;
                     case CITYTO:
-                        if (station != null && !station.equals(stationFrom)) {
-                            stationTo = station;
-                            to.setText(station.getStationTitle());
+                        if (stationId != -1 && stationId != stationFrom.getStationId()) {
+                            stationTo = getStationById("TO", stationId);
+                            if (stationTo != null)
+                                to.setText(stationTo.getStationTitle());
                         }
-                        if (station != null && station.equals(stationFrom)) {
+                        if (stationId != -1 && stationId == stationFrom.getStationId()) {
                             Toast.makeText(this, STATION_EQUAL,
                                     Toast.LENGTH_LONG).show();
                         }
+                        // сбром фильтра
+                        ListAdapter.adapterTo.getFilter().filter("");
                         break;
                 }
             }
