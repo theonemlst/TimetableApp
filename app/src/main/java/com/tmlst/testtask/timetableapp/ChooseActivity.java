@@ -12,6 +12,11 @@ import android.widget.SearchView;
 import com.tmlst.testtask.timetableapp.model.Model;
 import com.tmlst.testtask.timetableapp.model.Station;
 
+import static com.tmlst.testtask.timetableapp.MainActivity.CITYFROM;
+import static com.tmlst.testtask.timetableapp.MainActivity.CITYTO;
+import static com.tmlst.testtask.timetableapp.MainActivity.STATION;
+import static com.tmlst.testtask.timetableapp.MainActivity.STATION_TYPE;
+
 
 public class ChooseActivity extends Activity
         implements SearchView.OnQueryTextListener, JsonParser.OnParseListener {
@@ -63,8 +68,8 @@ public class ChooseActivity extends Activity
                         get(groupPosition).getStations().get(childPosition);
 
                 Intent intent = new Intent(ChooseActivity.this, MainActivity.class);
-                intent.putExtra("station", station);
-                intent.putExtra("stationType",stationsType);
+                intent.putExtra(STATION, station);
+                intent.putExtra(STATION_TYPE,stationsType);
                 setResult(RESULT_OK, intent);
                 finish();
 
@@ -77,7 +82,7 @@ public class ChooseActivity extends Activity
 
         Intent intent = getIntent();
         if (intent.getExtras() != null) {
-             stationsType = intent.getStringExtra(MainActivity.STATION_TYPE);
+             stationsType = intent.getStringExtra(STATION_TYPE);
         }
         setStationsAdapter();
 
@@ -92,13 +97,13 @@ public class ChooseActivity extends Activity
 
     private void setStationsAdapter() {
         switch (stationsType) {
-            case "FROM":
+            case CITYFROM:
                 if (ListAdapter.adapterFrom != null) {
                     adapter = ListAdapter.adapterFrom;
                     adapter.notifyDataSetChanged();
                 }
                 break;
-            case "TO":
+            case CITYTO:
                 if (ListAdapter.adapterTo != null) {
                     adapter = ListAdapter.adapterTo;
                     adapter.notifyDataSetChanged();
@@ -116,7 +121,9 @@ public class ChooseActivity extends Activity
     @Override
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
+        for (int i = 0; i < adapter.getGroupCount(); i++) {
+            expandableListView.collapseGroup(i);
+        }
         return false;
     }
-
 }

@@ -17,17 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tmlst.testtask.timetableapp.MainActivity.CITYFROM;
+import static com.tmlst.testtask.timetableapp.MainActivity.CITYTO;
+
 /**
  * Created by User on 16.03.2018.
  */
 
 public class JsonParser extends AsyncTask<Void, Void, Model> {
 
-    public static final String CITYFROM = "FROM";
-    public static final String CITYTO = "TO";
-
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
+
     private static OnParseListener mlistener;
 
     public interface OnParseListener
