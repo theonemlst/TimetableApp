@@ -1,10 +1,16 @@
 package com.tmlst.testtask.timetableapp;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
@@ -19,7 +25,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String CITYFROM = "FROM";
     public static final String CITYTO = "TO";
@@ -50,6 +57,20 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+
         model = Model.getInstance();
         JsonParser parseJsonTask = new JsonParser(this, model);
         parseJsonTask.execute();
@@ -72,9 +93,36 @@ public class MainActivity extends Activity {
         });
         if (stationTo != null) from.setText(stationTo.getStationTitle());
 
+
         mCalendar = Calendar.getInstance();
         date = findViewById(R.id.date);
         date.setText(sdf.format(mCalendar.getTime()));
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.nav_timetable) {
+
+        } else if (id == R.id.nav_about) {
+
+        }
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -134,6 +182,7 @@ public class MainActivity extends Activity {
     }
 
     DatePickerDialog.OnDateSetListener myCallBack = new DatePickerDialog.OnDateSetListener() {
+
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             mCalendar.set(year, monthOfYear, dayOfMonth);
