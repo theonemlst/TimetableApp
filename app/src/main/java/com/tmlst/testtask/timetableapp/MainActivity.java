@@ -118,7 +118,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_timetable) {
 
         } else if (id == R.id.nav_about) {
-
+            Intent intent = new Intent(MainActivity.this, CopyrightActivity.class);
+            startActivity(intent);
         }
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

@@ -2,11 +2,12 @@
     <string name="json_file_name">all_stations</string>
 
     <string name="app_name">Расписание транспорта</string>
+    <string name="about_title">О приложении</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="timetable_text">Расписание</string>
-    <string name="about_text">О программе</string>
+    <string name="about_text">О приложении</string>
 
 </resources>
