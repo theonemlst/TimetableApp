@@ -1,5 +1,6 @@
 <resources>
     <string name="json_file_name">all_stations</string>
+    <string name="state_file_name">app_state</string>
 
     <string name="app_name">Расписание транспорта</string>
     <string name="about_title">О приложении</string>

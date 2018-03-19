@@ -1,8 +1,10 @@
 package com.tmlst.testtask.timetableapp;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,17 +18,21 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tmlst.testtask.timetableapp.model.City;
 import com.tmlst.testtask.timetableapp.model.Model;
 import com.tmlst.testtask.timetableapp.model.Station;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        JsonParser.OnParseListener {
 
     public static final String CITYFROM = "FROM";
     public static final String CITYTO = "TO";
@@ -38,6 +44,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQUEST_CODE = 1;
     private static final int DIALOG_DATE = 1;
+
+    private static final String STATION_FROM_ID = "stationFromId";
+    private static final String STATION_TO_ID = "stationToId";
 
     private static final DateFormat sdf =
             new SimpleDateFormat("dd.MM.yyyy", Locale.US);
@@ -51,6 +60,8 @@ public class MainActivity extends AppCompatActivity
     private Station stationFrom;
     private Station stationTo;
     private Calendar mCalendar;
+
+   // private boolean stationsLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +83,9 @@ public class MainActivity extends AppCompatActivity
 
 
         model = Model.getInstance();
-        JsonParser parseJsonTask = new JsonParser(this, model);
-        parseJsonTask.execute();
+        JsonParser jsonParser = new JsonParser(this, model);
+        JsonParser.setOnParseListener(this);
+        jsonParser.execute();
 
         from = findViewById(R.id.stationFrom);
         from.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +94,6 @@ public class MainActivity extends AppCompatActivity
                 startChooseActivity(CITYFROM);
             }
         });
-        if (stationFrom != null) from.setText(stationFrom.getStationTitle());
 
         to = findViewById(R.id.stationTo);
         to.setOnClickListener(new View.OnClickListener() {
@@ -91,12 +102,77 @@ public class MainActivity extends AppCompatActivity
                 startChooseActivity(CITYTO);
             }
         });
-        if (stationTo != null) from.setText(stationTo.getStationTitle());
-
 
         mCalendar = Calendar.getInstance();
         date = findViewById(R.id.date);
         date.setText(sdf.format(mCalendar.getTime()));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = activityPreferences.edit();
+        int stationFromId = -1;
+        if (stationFrom != null) {
+            stationFromId = stationFrom.getStationId();
+        }
+        int stationToId = -1;
+        if (stationTo != null) {
+            stationToId = stationTo.getStationId();
+        }
+        editor.putInt(STATION_FROM_ID, stationFromId);
+        editor.putInt(STATION_TO_ID, stationToId);
+        editor.apply();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onComplete() {
+            loadStations();
+    }
+
+    private void loadStations() {
+        SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
+
+        int stationFromId = activityPreferences.getInt(STATION_FROM_ID, -1);
+        int stationToId = activityPreferences.getInt(STATION_TO_ID, -1);
+
+        if (stationFromId != -1) {
+            stationFrom = getStationById("FROM", stationFromId);
+            if (stationFrom != null)
+                from.setText(stationFrom.getStationTitle());
+        }
+        if (stationToId != -1) {
+            stationTo = getStationById("TO", stationToId);
+            if (stationTo != null)
+                to.setText(stationTo.getStationTitle());
+        }
+    }
+
+    private Station getStationById(String stationType, int id) {
+        List<City> cities = new ArrayList<>();
+        if ("FROM".equals(stationType)) {
+            cities = model.getCitiesFrom();
+        }
+        if ("TO".equals(stationType)) {
+            cities = model.getCitiesTo();
+        }
+
+        for (City city: cities) {
+            List<Station> stations = city.getStations();
+            for(Station station: stations) {
+                if (station.getStationId() == id) {
+                    return station;
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
