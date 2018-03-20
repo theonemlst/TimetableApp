@@ -12,15 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 /**
- * A simple {@link Fragment} subclass.
+ *    Фрагмент экрана "копирайт"
  */
-public class CopyrightFragment extends Fragment {
+
+public class CopyrightFrag extends Fragment {
+
 
     private Context mContext = null;
 
-    public CopyrightFragment() {}
+    public CopyrightFrag() {}
 
     public void setmContext(Context mContext) {
         this.mContext = mContext;
@@ -30,9 +31,9 @@ public class CopyrightFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_copyright, container, false);
-
+//        Устанавливаем заголовок в Application Bar
         ((Activity) mContext).setTitle(R.string.about_title);
-
+//        Выводим в TextView информацию
         TextView copyrightInfo = view.findViewById(R.id.copyright_info);
         copyrightInfo.setText(getCopyrightString());
 
@@ -50,6 +51,6 @@ public class CopyrightFragment extends Fragment {
         }
 
         return getResources().getString(R.string.app_name) + " v " +
-                versionName + "\n" + "©2018, Yaroslav Lagosha";
+                versionName + "\n" + getString(R.string.copyright_info);
     }
 }

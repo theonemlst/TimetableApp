@@ -3,7 +3,7 @@ package com.tmlst.testtask.timetableapp.model;
 import java.util.List;
 
 /**
- * Created by User on 16.03.2018.
+ *   Класс города
  */
 
 public class City {

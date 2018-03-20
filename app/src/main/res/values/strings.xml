@@ -11,7 +11,21 @@
     <string name="timetable_text">Расписание</string>
     <string name="about_text">О приложении</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="list_item_image">Изображение</string>
+    <string name="nav_header_image">Изображение заголовка меню</string>
 
+    <string name="from_string">Откуда</string>
+    <string name="to_string">Куда</string>
+    <string name="date_string">Дата</string>
+    <string name="reset_string">Сбросить</string>
+
+    <string name="twice_click_for_exit_toast_text">Нажмите еще раз для выхода</string>
+    <string name="stations_are_equal_toast_text">Пункты отправления и назначения совпадают!</string>
+
+    <string name="copyright_info">©2018, Yaroslav Lagosha</string>
+
+    <string name="detail_info_country_label">Страна:   </string>
+    <string name="detail_info_city_label">Город:    </string>
+    <string name="detail_info_region_label">Область:  </string>
+    <string name="detail_info_district_label">Район:    </string>
 </resources>

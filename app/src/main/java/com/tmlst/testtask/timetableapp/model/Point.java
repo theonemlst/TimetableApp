@@ -1,7 +1,7 @@
 package com.tmlst.testtask.timetableapp.model;
 
 /**
- * Created by User on 16.03.2018.
+ *   Класс точки
  */
 
 public class Point {

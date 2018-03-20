@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="10dp">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
         <TextView
             android:id="@+id/country_name"
@@ -25,6 +22,4 @@
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"/>
 
-    </RelativeLayout>
-
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>
