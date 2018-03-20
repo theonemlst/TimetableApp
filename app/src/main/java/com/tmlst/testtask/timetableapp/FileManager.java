@@ -23,10 +23,6 @@ class FileManager {
     FileManager(Context context) {
         this.context = context;
         fileName = context.getResources().getString(R.string.json_file_name);
-//TODO - удалить удаление
-        File dir = context.getFilesDir();
-        File file = new File(dir, fileName);
-        boolean deleted = file.delete();
     }
 
     //    Читаем json из памяти и возвращаем в виде строки
