@@ -67,10 +67,10 @@ public class TimetableFragment extends Fragment implements JsonParser.OnParseLis
         lv = view.findViewById(R.id.list_view);
 
         dataList = new ArrayList<>();
-        dataList.add(new ListViewData("", "Откуда", ""));
-        dataList.add(new ListViewData("", "Куда", ""));
-        dataList.add(new ListViewData("", "Дата", ""));
-        dataList.add(new ListViewData("", "Сбросить", ""));
+        dataList.add(new ListViewData("", "Откуда", "", R.drawable.ic_action_from));
+        dataList.add(new ListViewData("", "Куда", "", R.drawable.ic_action_to));
+        dataList.add(new ListViewData("", "Дата", "", R.drawable.ic_action_date));
+        dataList.add(new ListViewData("", "Сбросить", "", R.drawable.ic_action_cancel));
 
         listviewAdapter = new ListviewAdapter(mContext, dataList);
         lv.setAdapter(listviewAdapter);

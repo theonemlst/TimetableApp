@@ -8,11 +8,13 @@ class ListViewData {
     private String countryTitle;
     private String cityTitle;
     private String stationTitle;
+    private int src;
 
-    ListViewData(String countryTitle, String cityTitle, String stationTitle) {
+    public ListViewData(String countryTitle, String cityTitle, String stationTitle, int src) {
         this.countryTitle = countryTitle;
         this.cityTitle = cityTitle;
         this.stationTitle = stationTitle;
+        this.src = src;
     }
 
     String getCountryTitle() {
@@ -37,5 +39,13 @@ class ListViewData {
 
     void setStationTitle(String stationTitle) {
         this.stationTitle = stationTitle;
+    }
+
+    public int getSrc() {
+        return src;
+    }
+
+    public void setSrc(int src) {
+        this.src = src;
     }
 }
