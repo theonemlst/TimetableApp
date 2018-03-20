@@ -13,13 +13,19 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by User on 17.03.2018.
+ *   Класс адаптера для ListView станций
  */
 
 public class ListAdapter extends BaseExpandableListAdapter implements Filterable {
 
-    static ListAdapter adapterFrom = null;
-    static ListAdapter adapterTo = null;
+    static final String STATION_ID = "stationId";
+    static final String STATION_TITLE = "stationTitle";
+    static final String CITY_TITLE = "cityTitle";
+    static final String COUNTRY_TITLE = "countryTitle";
+
+
+    private static ListAdapter adapterFrom = null;
+    private static ListAdapter adapterTo = null;
 
     private ArrayList<Map<String, String>> originalCityList = null;
     private ArrayList<Map<String, String>> filteredCityList = null;
@@ -39,9 +45,25 @@ public class ListAdapter extends BaseExpandableListAdapter implements Filterable
         mInflater = LayoutInflater.from(context);
     }
 
+    static ListAdapter getAdapterFrom() {
+        return adapterFrom;
+    }
+
+    static ListAdapter getAdapterTo() {
+        return adapterTo;
+    }
+
+    static void setAdapterFrom(ListAdapter adapterFrom) {
+        ListAdapter.adapterFrom = adapterFrom;
+    }
+
+    static void setAdapterTo(ListAdapter adapterTo) {
+        ListAdapter.adapterTo = adapterTo;
+    }
+
     int getStationId(int groupPosition, int childPosition) {
         return Integer.valueOf(filteredStationList.
-                get(groupPosition).get(childPosition).get("stationId"));
+                get(groupPosition).get(childPosition).get(STATION_ID));
     }
 
     @Override
@@ -56,12 +78,12 @@ public class ListAdapter extends BaseExpandableListAdapter implements Filterable
 
     @Override
     public Object getGroup(int groupPosition) {
-        return filteredCityList.get(groupPosition).get("cityName");
+        return filteredCityList.get(groupPosition).get(CITY_TITLE);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return filteredStationList.get(groupPosition).get(childPosition).get("stationName");
+        return filteredStationList.get(groupPosition).get(childPosition).get(STATION_TITLE);
     }
 
     @Override
@@ -83,7 +105,7 @@ public class ListAdapter extends BaseExpandableListAdapter implements Filterable
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         View v;
         String cityName = (String) getGroup(groupPosition);
-        String countryName = filteredCityList.get(groupPosition).get("countryTitle");
+        String countryName = filteredCityList.get(groupPosition).get(COUNTRY_TITLE);
         if (convertView == null) {
             v = mInflater.inflate(R.layout.group_items, null);
         } else {
@@ -131,23 +153,30 @@ public class ListAdapter extends BaseExpandableListAdapter implements Filterable
                     new ArrayList<>(cityCount);
             final ArrayList<ArrayList<Map<String, String>>> newStationList =
                     new ArrayList<>(stationCount);
-
+//             Если введенная в SearchView последовательность встречается в
+//            названии страны - добавляем все ее города со всеми станциями
             for (int i = 0; i < cityCount; i++) {
-                if (originalCityList.get(i).get("countryTitle").
+                if (originalCityList.get(i).get(COUNTRY_TITLE).
                         toLowerCase().contains(filterString)) {
+
                     newCityList.add(originalCityList.get(i));
                     newStationList.add(originalStationList.get(i));
+//             Если введенная в SearchView последовательность встречается в
+//            названии города - добавляем все его станции
                 } else {
-                    if (originalCityList.get(i).get("cityName").
+                    if (originalCityList.get(i).get(CITY_TITLE).
                             toLowerCase().contains(filterString)) {
+
                         newCityList.add(originalCityList.get(i));
                         newStationList.add(originalStationList.get(i));
+//                    Иначе отбираем подходящие станции города
                     } else {
+
                         ArrayList<Map<String, String>> matchedStationNames = new ArrayList<>();
                         ArrayList<Map<String, String>> stationsOfCity =
                                 originalStationList.get(i);
                         for (Map<String, String> station : stationsOfCity) {
-                            if (station.get("stationName").
+                            if (station.get(STATION_TITLE).
                                     toLowerCase().contains(filterString))
                                 matchedStationNames.add(station);
                         }

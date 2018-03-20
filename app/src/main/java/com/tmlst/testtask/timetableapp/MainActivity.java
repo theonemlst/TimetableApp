@@ -20,28 +20,29 @@ import android.widget.Toast;
 
 import com.tmlst.testtask.timetableapp.model.Model;
 
-import java.util.Calendar;
-
-import static com.tmlst.testtask.timetableapp.TimetableFragment.DAY;
-import static com.tmlst.testtask.timetableapp.TimetableFragment.MONTH;
-import static com.tmlst.testtask.timetableapp.TimetableFragment.YEAR;
-
+/**
+ *   Класс главной активности
+ */
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String CITYFROM = "FROM";
-    public static final String CITYTO = "TO";
+    public static final String FROM = "FROM";
+    public static final String TO = "TO";
 
-    public static final String STATION_TYPE = "stationType";
-    public static final String STATION = "station";
+    private static final String YEAR = "YEAR";
+    private static final String MONTH = "MONTH";
+    private static final String DAY = "DAY";
 
-    public static final String STATION_EQUAL = "stations are equal!";
+    private static final String STATION_FROM_ID = "stationFromId";
+    private static final String STATION_TO_ID = "stationToId";
 
-    public static final String STATION_FROM_ID = "stationFromId";
-    public static final String STATION_TO_ID = "stationToId";
+    public static final int NULL_STATION_INDEX = -1;
+    private static final int NULL_DATE_MENBER = -1;
 
-    boolean doubleBackToExitPressedOnce = false;
+    private boolean doubleBackToExitPressedOnce = false;
+
+    private AppState appState;
 
     private FragmentManager fragmentManager = getFragmentManager();
 
@@ -50,10 +51,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Model model = State.getInstance().getModel();
+        appState = AppState.getInstance();
+
+//        Запускаем парсинг json
+        Model model = appState.getModel();
         JsonParser jsonParser = new JsonParser(this, model);
         jsonParser.execute();
-
+//        Инициализация бокового меню и панели действий
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -66,7 +70,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        TimetableFragment fragment = new TimetableFragment();
+//        Создаем и добавляем во фрагмент-менеджер фрагмент расписания
+        TimetableFrag fragment = new TimetableFrag();
         fragment.setmContext(this);
         fragmentManager.beginTransaction().replace(R.id.main_container, fragment)
                 .addToBackStack(null)
@@ -76,50 +81,53 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-
+//        Сохраняем состояние приложения в SharedPreferences в MODE_PRIVATE режиме
         SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = activityPreferences.edit();
 
-        editor.putLong(STATION_FROM_ID, State.getInstance().getStationFromId());
-        editor.putLong(STATION_TO_ID, State.getInstance().getStationToId());
-        editor.putInt(YEAR, State.getInstance().getYear());
-        editor.putInt(MONTH, State.getInstance().getMonth());
-        editor.putInt(DAY, State.getInstance().getDay());
+        editor.putLong(STATION_FROM_ID, appState.getStationFromId());
+        editor.putLong(STATION_TO_ID, appState.getStationToId());
+        editor.putInt(YEAR, appState.getYear());
+        editor.putInt(MONTH, appState.getMonth());
+        editor.putInt(DAY, appState.getDay());
         editor.apply();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+//        Восстанавливаем состояние из SharedPreferences
         SharedPreferences activityPreferences = getPreferences(Activity.MODE_PRIVATE);
 
-        State.getInstance().setStationFromId(activityPreferences.getLong(STATION_FROM_ID, -1));
-        State.getInstance().setStationToId(activityPreferences.getLong(STATION_TO_ID, -1));
-        int year = activityPreferences.getInt(YEAR, -1);
-        int month = activityPreferences.getInt(MONTH, -1);
-        int day = activityPreferences.getInt(DAY, -1);
-        if (year != -1 && month != -1 && day != -1)
-            State.getInstance().getCalendar().set(year, month, day);
+        appState.setStationFromId(activityPreferences.getLong(STATION_FROM_ID, NULL_STATION_INDEX));
+        appState.setStationToId(activityPreferences.getLong(STATION_TO_ID, NULL_STATION_INDEX));
+        int year = activityPreferences.getInt(YEAR, NULL_DATE_MENBER);
+        int month = activityPreferences.getInt(MONTH, NULL_DATE_MENBER);
+        int day = activityPreferences.getInt(DAY, NULL_DATE_MENBER);
+        if (year != NULL_DATE_MENBER && month != NULL_DATE_MENBER && day != NULL_DATE_MENBER)
+            appState.getCalendar().set(year, month, day);
     }
 
     @Override
     public void onBackPressed() {
-
+//        Обработка BACK BUTTON
+//        Если "шторка" меню открыта - закрываем ее
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (getFragmentManager().getBackStackEntryCount() == 1) {
-
+//            Иначе если в стеке один фрагмент - и BACK BUTTON нажата повторно -
+//                    выходим из приложения путем двукратного программного нажатия
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 super.onBackPressed();
                 return;
             }
-
+//            При первом нажатии - выводим подсказку в Toast
             this.doubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Нажмите еще раз для выхода", Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(this, getString(R.string.twice_click_for_exit_toast_text),
+                    Toast.LENGTH_SHORT).show();
+//            Ждем повторного нажатия 2 секунды
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -127,6 +135,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }, 2000);
         } else {
+//            Достаем предыдущий фрагмент
             super.onBackPressed();
         }
     }
@@ -136,16 +145,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
-
+//        Обрабатываем нажатия на пункты бокового меню
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (id == R.id.nav_timetable) {
-            TimetableFragment fragment = new TimetableFragment();
+            TimetableFrag fragment = new TimetableFrag();
             fragment.setmContext(this);
             fragmentTransaction.replace(R.id.main_container, fragment)
                     .addToBackStack(null)
                     .commit();
         } else if (id == R.id.nav_about) {
-            CopyrightFragment fragment = new CopyrightFragment();
+            CopyrightFrag fragment = new CopyrightFrag();
             fragment.setmContext(this);
             fragmentTransaction.replace(R.id.main_container, fragment)
                     .addToBackStack(null)

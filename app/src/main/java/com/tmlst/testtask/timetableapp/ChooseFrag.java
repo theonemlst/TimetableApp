@@ -17,26 +17,26 @@ import android.widget.Toast;
 
 import com.tmlst.testtask.timetableapp.model.Station;
 
-import static com.tmlst.testtask.timetableapp.MainActivity.CITYFROM;
-import static com.tmlst.testtask.timetableapp.MainActivity.CITYTO;
-import static com.tmlst.testtask.timetableapp.MainActivity.STATION_EQUAL;
-
+import static com.tmlst.testtask.timetableapp.MainActivity.FROM;
+import static com.tmlst.testtask.timetableapp.MainActivity.TO;
 
 /**
- * A simple {@link Fragment} subclass.
+ *    Фрагмент экрана выбора станции
  */
-public class ChooseFragment extends Fragment implements SearchView.OnQueryTextListener, JsonParser.OnParseListener {
+
+public class ChooseFrag extends Fragment implements SearchView.OnQueryTextListener, JsonParser.OnParseListener {
 
     private ListAdapter adapter;
     private ExpandableListView expandableListView;
     private String stationsType;
-    SearchView editsearch;
+    SearchView editSearch;
 
     private Context mContext;
+    private AppState appState;
 
     private int lastExpandedPosition = -1;
 
-    public ChooseFragment() {}
+    public ChooseFrag() {}
 
     public void setmContext(Context mContext) {
         this.mContext = mContext;
@@ -51,7 +51,12 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_choose, container, false);
 
+        appState = AppState.getInstance();
+
         expandableListView = view.findViewById(R.id.list_view);
+
+//        Обраюотчик долгого нажатия на дочерний элемент списка,
+//                выводит подробную информацию о станции
         expandableListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -60,12 +65,13 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
                     int groupPosition = ExpandableListView.getPackedPositionGroup(id);
                     int childPosition = ExpandableListView.getPackedPositionChild(id);
 
-                    Station station = State.getInstance().getModel().getCitiesFrom().
+                    Station station = appState.getModel().getCitiesFrom().
                             get(groupPosition).getStations().get(childPosition);
-                    String stationInfo = "Страна:   " + station.getCountryTitle() + "\n" +
-                            "Город:    " + station.getCityTitle() + "\n" +
-                            "Область:  " + station.getRegionTitle() + "\n" +
-                            "Район:    " + station.getDistrictTitle();
+                    String stationInfo = getString(R.string.detail_info_country_label) +
+                            station.getCountryTitle() + "\n" +
+                            getString(R.string.detail_info_city_label) + station.getCityTitle() + "\n" +
+                            getString(R.string.detail_info_region_label) + station.getRegionTitle() + "\n" +
+                            getString(R.string.detail_info_district_label) + station.getDistrictTitle();
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                     builder.setTitle(station.getStationTitle())
@@ -81,38 +87,41 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
             }
         });
 
+//        Обработчик нажатия на дочерний элемент
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
+//                Если выбранная станция не совпадает с другой выбранной - запоминаем ее,
+//                  иначе показываем Toast
                 switch (stationsType) {
-                    case CITYFROM:
+                    case FROM:
                         long newStationFromId = adapter.getStationId(groupPosition, childPosition);
-                        if (State.getInstance().getStationToId() != newStationFromId) {
-                            State.getInstance().setStationFromId(newStationFromId);
+                        if (appState.getStationToId() != newStationFromId) {
+                            appState.setStationFromId(newStationFromId);
                         } else {
-                            Toast.makeText(mContext, STATION_EQUAL, Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, getString(R.string.stations_are_equal_toast_text),
+                                    Toast.LENGTH_LONG).show();
                         }
                         break;
-                    case CITYTO:
+                    case TO:
                         long newStationToId = adapter.getStationId(groupPosition, childPosition);
-                        if (State.getInstance().getStationFromId() != newStationToId) {
-                            State.getInstance().setStationToId(newStationToId);
+                        if (appState.getStationFromId() != newStationToId) {
+                            appState.setStationToId(newStationToId);
                         } else {
-                            Toast.makeText(mContext, STATION_EQUAL, Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, getString(R.string.stations_are_equal_toast_text), Toast.LENGTH_LONG).show();
                         }
                         break;
                 }
-                //adapter.getFilter().filter("");// сброc фильтра
                 // скрываем клавиатуру
                 hideKeyBoard();
-
+                // Возвращаем предыдущий фрагмент
                 ((Activity) mContext).onBackPressed();
 
                 return false;
             }
         });
 
+//        При раскрытии новой группы сворачиваем предыдущую и прячем клавиатуру
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
@@ -126,13 +135,17 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
         });
 
         ((Activity) mContext).setTitle(R.string.app_name);
-
+//        Регистрируем объект класса слушателем события окончания парсинга
         JsonParser.setOnParseListener(this);
         setStationsAdapter();
 
-        editsearch = view.findViewById(R.id.search);
-        editsearch.setOnQueryTextListener(this);
-        editsearch.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+        editSearch = view.findViewById(R.id.search);
+
+//        Устанавливаем слушателя поисковых запросов SearchView
+        editSearch.setOnQueryTextListener(this);
+
+//        При установке фокуса в SearchView закрываем раскрытую группу
+        editSearch.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 expandableListView.collapseGroup(lastExpandedPosition);
@@ -142,10 +155,11 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
         return view;
     }
 
+//    Прячет клавиатуру
     private void hideKeyBoard() {
         InputMethodManager imm = (InputMethodManager)
                 mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editsearch.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
     }
 
     @Override
@@ -153,24 +167,28 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
         setStationsAdapter();
     }
 
+//    Функция установки адаптера для ExpandableListView, вызывается при
+//            инициализации фрагмента и в методе onComplete().
+//    Если парсинг не завершен в момент инициализации фрагмента -
+//    устанавливает его по завершении парсинга в методе onComplete(),
+//    иначе - устанавливает сразу, метод onComplete() вызван не будет.
     private void setStationsAdapter() {
+
         switch (stationsType) {
-            case CITYFROM:
-                if (ListAdapter.adapterFrom != null) {
-                    adapter = ListAdapter.adapterFrom;
-                    adapter.notifyDataSetChanged();
-                }
+            case FROM:
+                    adapter = ListAdapter.getAdapterFrom();
                 break;
-            case CITYTO:
-                if (ListAdapter.adapterTo != null) {
-                    adapter = ListAdapter.adapterTo;
-                    adapter.notifyDataSetChanged();
-                }
+            case TO:
+                    adapter = ListAdapter.getAdapterTo();
                 break;
         }
-        expandableListView.setAdapter(adapter);
-        if (adapter != null)
-            adapter.getFilter().filter("");// сброc фильтра
+
+        if (adapter != null) {
+            expandableListView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+//        Cбраcываем фильтр
+            adapter.getFilter().filter("");
+        }
     }
 
     @Override
@@ -178,6 +196,7 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
         return false;
     }
 
+//    Вызывается при вводе поискового запроса
     @Override
     public boolean onQueryTextChange(String newText) {
         expandableListView.collapseGroup(lastExpandedPosition);
