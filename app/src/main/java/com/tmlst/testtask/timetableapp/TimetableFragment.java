@@ -44,6 +44,7 @@ public class TimetableFragment extends Fragment implements JsonParser.OnParseLis
 
     private Context mContext;
     private ListviewAdapter listviewAdapter;
+    ListView lv;
 
     ArrayList<ListViewData> dataList;
 
@@ -63,7 +64,7 @@ public class TimetableFragment extends Fragment implements JsonParser.OnParseLis
 
         ((Activity) mContext).setTitle(R.string.app_name);
 
-        ListView lv = view.findViewById(R.id.list_view);
+        lv = view.findViewById(R.id.list_view);
 
         dataList = new ArrayList<>();
         dataList.add(new ListViewData("", "Откуда", ""));
@@ -77,38 +78,43 @@ public class TimetableFragment extends Fragment implements JsonParser.OnParseLis
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        startFragment(CITYFROM);
-                        break;
-                    case 1:
-                        startFragment(CITYTO);
-                        break;
-                    case 2:
-                        DatePickerDialog datePicker = new DatePickerDialog(mContext,
-                                datePickerListener,
-                                mCalendar.get(Calendar.YEAR),
-                                mCalendar.get(Calendar.MONTH),
-                                mCalendar.get(Calendar.DAY_OF_MONTH));
-                        datePicker.setCancelable(false);
-                        datePicker.show();
-                        break;
-                    case 3:
-                        stationFrom = null;
-                        stationTo = null;
-                        mCalendar = Calendar.getInstance();
+                if (listviewAdapter.isEnabled(position))
+                    switch (position) {
+                        case 0:
+                            startFragment(CITYFROM);
+                            break;
+                        case 1:
+                            startFragment(CITYTO);
+                            break;
+                        case 2:
+                            DatePickerDialog datePicker = new DatePickerDialog(mContext,
+                                    datePickerListener,
+                                    mCalendar.get(Calendar.YEAR),
+                                    mCalendar.get(Calendar.MONTH),
+                                    mCalendar.get(Calendar.DAY_OF_MONTH));
+                            datePicker.setCancelable(false);
+                            datePicker.show();
+                            break;
+                        case 3:
+                            stationFrom = null;
+                            stationTo = null;
+                            mCalendar = Calendar.getInstance();
 
-                        dataList.get(0).setCityTitle("Откуда");
-                        dataList.get(1).setCityTitle("Куда");
-                        dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
+                            dataList.get(0).setCountryTitle("Откуда");
+                            dataList.get(0).setCityTitle("");
+                            dataList.get(0).setStationTitle("");
+                            dataList.get(1).setCountryTitle("Куда");
+                            dataList.get(1).setCityTitle("");
+                            dataList.get(1).setStationTitle("");
+                            dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
 
-                        State.getInstance().setStationFromId(-1);
-                        State.getInstance().setStationToId(-1);
-                        State.getInstance().setCalendar(mCalendar);
+                            State.getInstance().setStationFromId(-1);
+                            State.getInstance().setStationToId(-1);
+                            State.getInstance().setCalendar(mCalendar);
 
-                        listviewAdapter.notifyDataSetChanged();
-                        break;
-                }
+                            listviewAdapter.notifyDataSetChanged();
+                            break;
+                    }
             }
 
             private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
@@ -154,17 +160,23 @@ public class TimetableFragment extends Fragment implements JsonParser.OnParseLis
 
         stationFrom = getStationById("FROM", stationFromId);
         if (stationFrom != null){
-            dataList.get(0).setCityTitle(stationFrom.getStationTitle());
-            listviewAdapter.notifyDataSetChanged();
+            dataList.get(0).setCountryTitle(stationFrom.getStationTitle());
+            dataList.get(0).setCityTitle(stationFrom.getCountryTitle());
+            dataList.get(0).setStationTitle(stationFrom.getCityTitle());
         }
 
         stationTo = getStationById("TO", stationToId);
         if (stationTo != null) {
-            dataList.get(1).setCityTitle(stationTo.getStationTitle());
-            listviewAdapter.notifyDataSetChanged();
+            dataList.get(1).setCountryTitle(stationTo.getStationTitle());
+            dataList.get(1).setCityTitle(stationTo.getCountryTitle());
+            dataList.get(1).setStationTitle(stationTo.getCityTitle());
         }
 
         dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
+        listviewAdapter.notifyDataSetChanged();
+        // ожидаем окончания парсинга
+        if (State.getInstance().getModel().getCitiesTo() != null)
+            listviewAdapter.setItemsEnabled(true);
     }
 
     private Station getStationById(String stationType, long id) {

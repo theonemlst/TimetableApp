@@ -4,7 +4,7 @@ package com.tmlst.testtask.timetableapp;
  * Created by User on 20.03.2018.
  */
 
-public class ListViewData {
+class ListViewData {
     private String countryTitle;
     private String cityTitle;
     private String stationTitle;
@@ -19,7 +19,7 @@ public class ListViewData {
         return countryTitle;
     }
 
-    public void setCountryTitle(String countryTitle) {
+    void setCountryTitle(String countryTitle) {
         this.countryTitle = countryTitle;
     }
 
@@ -35,7 +35,7 @@ public class ListViewData {
         return stationTitle;
     }
 
-    public void setStationTitle(String stationTitle) {
+    void setStationTitle(String stationTitle) {
         this.stationTitle = stationTitle;
     }
 }

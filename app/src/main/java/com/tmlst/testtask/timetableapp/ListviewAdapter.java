@@ -18,14 +18,26 @@ public class ListviewAdapter extends BaseAdapter {
     private static ArrayList<ListViewData> listContact;
 
     private LayoutInflater mInflater;
+    private boolean isItemsEnabled = false;
 
-    public ListviewAdapter(Context photosFragment, ArrayList<ListViewData> results){
+    ListviewAdapter(Context photosFragment, ArrayList<ListViewData> results){
         listContact = results;
         mInflater = LayoutInflater.from(photosFragment);
     }
 
     public static void setListContact(ArrayList<ListViewData> listContact) {
         ListviewAdapter.listContact = listContact;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        if (position < 2)
+            return isItemsEnabled;
+        else return true;
+    }
+
+    public void setItemsEnabled(boolean enabled) {
+        isItemsEnabled = enabled;
     }
 
     @Override

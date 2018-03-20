@@ -169,7 +169,8 @@ public class ChooseFragment extends Fragment implements SearchView.OnQueryTextLi
                 break;
         }
         expandableListView.setAdapter(adapter);
-        adapter.getFilter().filter("");// сброc фильтра
+        if (adapter != null)
+            adapter.getFilter().filter("");// сброc фильтра
     }
 
     @Override
