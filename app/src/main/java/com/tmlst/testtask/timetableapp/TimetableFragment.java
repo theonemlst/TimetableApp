@@ -10,8 +10,9 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.tmlst.testtask.timetableapp.model.City;
 import com.tmlst.testtask.timetableapp.model.Model;
@@ -26,28 +27,25 @@ import java.util.Locale;
 
 import static com.tmlst.testtask.timetableapp.MainActivity.CITYFROM;
 import static com.tmlst.testtask.timetableapp.MainActivity.CITYTO;
-import static com.tmlst.testtask.timetableapp.MainActivity.STATION_FROM_ID;
-import static com.tmlst.testtask.timetableapp.MainActivity.STATION_TO_ID;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TimetableFragment extends Fragment  implements JsonParser.OnParseListener{
+public class TimetableFragment extends Fragment implements JsonParser.OnParseListener{
 
     public static final String YEAR = "year";
     public static final String MONTH = "month";
     public static final String DAY = "day";
-
-    private TextView from;
-    private TextView to;
-    private TextView date;
 
     private Station stationFrom;
     private Station stationTo;
     private Calendar mCalendar;
 
     private Context mContext;
+    private ListviewAdapter listviewAdapter;
+
+    ArrayList<ListViewData> dataList;
 
     private static final DateFormat sdf =
             new SimpleDateFormat("dd.MM.yyyy", Locale.US);
@@ -65,35 +63,52 @@ public class TimetableFragment extends Fragment  implements JsonParser.OnParseLi
 
         ((Activity) mContext).setTitle(R.string.app_name);
 
-        from = view.findViewById(R.id.stationFrom);
-        from.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startFragment(CITYFROM);
-            }
-        });
+        ListView lv = view.findViewById(R.id.list_view);
 
-        to = view.findViewById(R.id.stationTo);
-        to.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startFragment(CITYTO);
-            }
-        });
+        dataList = new ArrayList<>();
+        dataList.add(new ListViewData("", "Откуда", ""));
+        dataList.add(new ListViewData("", "Куда", ""));
+        dataList.add(new ListViewData("", "Дата", ""));
+        dataList.add(new ListViewData("", "Сбросить", ""));
 
-        mCalendar = State.getInstance().getCalendar();
-        date = view.findViewById(R.id.date);
-        date.setText(sdf.format(mCalendar.getTime()));
-        date.setOnClickListener(new View.OnClickListener() {
+        listviewAdapter = new ListviewAdapter(mContext, dataList);
+        lv.setAdapter(listviewAdapter);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                DatePickerDialog datePicker = new DatePickerDialog(mContext,
-                        datePickerListener,
-                        mCalendar.get(Calendar.YEAR),
-                        mCalendar.get(Calendar.MONTH),
-                        mCalendar.get(Calendar.DAY_OF_MONTH));
-                datePicker.setCancelable(false);
-                datePicker.show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        startFragment(CITYFROM);
+                        break;
+                    case 1:
+                        startFragment(CITYTO);
+                        break;
+                    case 2:
+                        DatePickerDialog datePicker = new DatePickerDialog(mContext,
+                                datePickerListener,
+                                mCalendar.get(Calendar.YEAR),
+                                mCalendar.get(Calendar.MONTH),
+                                mCalendar.get(Calendar.DAY_OF_MONTH));
+                        datePicker.setCancelable(false);
+                        datePicker.show();
+                        break;
+                    case 3:
+                        stationFrom = null;
+                        stationTo = null;
+                        mCalendar = Calendar.getInstance();
+
+                        dataList.get(0).setCityTitle("Откуда");
+                        dataList.get(1).setCityTitle("Куда");
+                        dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
+
+                        State.getInstance().setStationFromId(-1);
+                        State.getInstance().setStationToId(-1);
+                        State.getInstance().setCalendar(mCalendar);
+
+                        listviewAdapter.notifyDataSetChanged();
+                        break;
+                }
             }
 
             private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
@@ -101,10 +116,14 @@ public class TimetableFragment extends Fragment  implements JsonParser.OnParseLi
                                       int selectedMonth, int selectedDay) {
                     mCalendar.set(selectedYear, selectedMonth, selectedDay);
                     State.getInstance().setCalendar(mCalendar);
-                    date.setText(sdf.format(mCalendar.getTime()));
+                    dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
+                    listviewAdapter.notifyDataSetChanged();
                 }
             };
         });
+
+        mCalendar = State.getInstance().getCalendar();
+        dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
 
         JsonParser.setOnParseListener(this);
         loadStations();
@@ -134,15 +153,18 @@ public class TimetableFragment extends Fragment  implements JsonParser.OnParseLi
         long stationToId = State.getInstance().getStationToId();
 
         stationFrom = getStationById("FROM", stationFromId);
-        if (stationFrom != null)
-            from.setText(stationFrom.getStationTitle());
+        if (stationFrom != null){
+            dataList.get(0).setCityTitle(stationFrom.getStationTitle());
+            listviewAdapter.notifyDataSetChanged();
+        }
 
         stationTo = getStationById("TO", stationToId);
-        if (stationTo != null)
-            to.setText(stationTo.getStationTitle());
+        if (stationTo != null) {
+            dataList.get(1).setCityTitle(stationTo.getStationTitle());
+            listviewAdapter.notifyDataSetChanged();
+        }
 
-        date.setText(sdf.format(mCalendar.getTime()));
-
+        dataList.get(2).setCityTitle(sdf.format(mCalendar.getTime()));
     }
 
     private Station getStationById(String stationType, long id) {
