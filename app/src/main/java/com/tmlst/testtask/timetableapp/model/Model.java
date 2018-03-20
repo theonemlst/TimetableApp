@@ -8,16 +8,16 @@ import java.util.List;
 
 public class Model {
 
-    private static final Model INSTANCE = new Model();
+    //private static final Model INSTANCE = new Model();
 
     private List<City> citiesFrom;
     private List<City> citiesTo;
 
-    private Model(){}
+    //private Model(){}
 
-    public static Model getInstance(){
-        return INSTANCE;
-    }
+//    public static Model getInstance(){
+//        return INSTANCE;
+//    }
 
     public List<City> getCitiesFrom() {
         return citiesFrom;

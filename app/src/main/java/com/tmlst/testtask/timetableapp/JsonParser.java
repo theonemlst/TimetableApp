@@ -29,7 +29,7 @@ public class JsonParser extends AsyncTask<Void, Void, Model> {
     private static final String STATIONS_FROM = "citiesFrom";
     private static final String STATIONS_TO = "citiesTo";
 
-    private static OnParseListener mlistener;
+    private static List<OnParseListener> mListeners = new ArrayList<>();
 
     public interface OnParseListener
     {
@@ -57,13 +57,14 @@ public class JsonParser extends AsyncTask<Void, Void, Model> {
     protected void onPostExecute(Model model) {
         ListAdapter.adapterFrom = getAdapter(mModel, CITYFROM);
         ListAdapter.adapterTo = getAdapter(mModel, CITYTO);
-        if (mlistener != null)
-            mlistener.onComplete();
+        for (OnParseListener listener: mListeners) {
+            listener.onComplete();
+        }
     }
 
     static void setOnParseListener(OnParseListener listener)
     {
-        mlistener = listener;
+        mListeners.add(listener);
     }
 
     private ListAdapter getAdapter(Model model, String citiesType) {

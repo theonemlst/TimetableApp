@@ -8,41 +8,9 @@ app:layout_behavior="@string/appbar_scrolling_view_behavior"
 tools:context="com.tmlst.testtask.timetableapp.MainActivity"
 tools:showIn="@layout/app_bar_main">
 
-    <LinearLayout
-        android:id="@+id/stats"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true">
-
-        <TextView
-            android:id="@+id/stationFrom"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="@android:color/holo_green_light"
-            android:text="Откуда" />
-
-        <TextView
-            android:id="@+id/stationTo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="@android:color/holo_green_light"
-            android:text=" Куда "/>
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/stats"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:background="@android:color/holo_blue_light"
-        android:text="Дата"
-        android:onClick="onclick"/>
+    <FrameLayout
+        android:id="@+id/main_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
